@@ -10,7 +10,7 @@
 	</form>
 	
 	<ul id="nav">
-		<li><a href="<?php echo base_url(); ?>"><i class="fa fa-home"></i><span>Trend Moment</span></a></li>
+		<li><a href="<?php echo base_url(); ?>"><i class="fa fa-home"></i><span>Daftar Buku</span></a></li>
 		<!--
 		<?php if ($user['user_type'] == 'admin') { ?>
 		<li><a href="<?php echo base_url('teacher'); ?>"><i class="fa fa-users"></i><span>Guru</span></a></li>

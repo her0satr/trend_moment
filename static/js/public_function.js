@@ -74,6 +74,9 @@ var Func = {
 				}
 			}
 		}
+		if (p.iDisplayLength != null) {
+			dt_param.iDisplayLength = p.iDisplayLength;
+		}
 		if (p.fnServerParams != null) {
 			dt_param.fnServerParams = p.fnServerParams;
 		}

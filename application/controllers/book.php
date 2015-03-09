@@ -10,14 +10,14 @@ class book extends SYGAAS_Controller {
 	}
 	
 	function grid() {
-		$_POST['column'] = array( 'title' );
+		$_POST['column'] = array( 'title', 'code' );
 		$_POST['is_custom']  = '<button class="btn btn-xs btn-edit" data-original-title="Edit"><img src="'.base_url('static/img/icons/icon-edit.png').'" /></button> ';
 		$_POST['is_custom'] .= '<button class="btn btn-xs btn-trend" data-original-title="Trend Moment"><img src="'.base_url('static/img/icons/icon-edit.png').'" /></button> ';
 		$_POST['is_custom'] .= '<button class="btn btn-xs btn-delete" data-original-title="Hapus"><img src="'.base_url('static/img/icons/icon-delete.png').'" /></button> ';
 		
 		
-		$array = $this->discipline_model->get_array($_POST);
-		$count = $this->discipline_model->get_count();
+		$array = $this->book_model->get_array($_POST);
+		$count = $this->book_model->get_count();
 		$grid = array( 'sEcho' => $_POST['sEcho'], 'aaData' => $array, 'iTotalRecords' => $count, 'iTotalDisplayRecords' => $count );
 		
 		echo json_encode($grid);
@@ -29,11 +29,11 @@ class book extends SYGAAS_Controller {
 		
 		$result = array();
 		if ($action == 'update') {
-			$result = $this->discipline_model->update($_POST);
+			$result = $this->book_model->update($_POST);
 		} else if ($action == 'get_by_id') {
-			$result = $this->discipline_model->get_by_id(array( 'id' => $_POST['id'] ));
+			$result = $this->book_model->get_by_id(array( 'id' => $_POST['id'] ));
 		} else if ($action == 'delete') {
-			$result = $this->discipline_model->delete($_POST);
+			$result = $this->book_model->delete($_POST);
 		}
 		
 		echo json_encode($result);

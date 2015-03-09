@@ -25,10 +25,5 @@ define('SHA_SECRET',							'OraNgerti');
 define('USER_ID_TU',							1);
 define('USER_ID_SISWA',							2);
 
-define('CLASS_LEVEL',							'class_level');
-define('DISCIPLINE',							'discipline');
-define('GRADE',									'grade');
-define('HOMEROOM',								'homeroom');
-define('STUDENT',								'student');
-define('TEACHER',								'teacher');
-define('USER',									'user');
+define('BOOK',									'book');
+define('TREND_MOMENT',							'trend_moment');

@@ -1,3 +1,11 @@
+<?php
+	$book_id = (isset($this->uri->segments[3])) ? $this->uri->segments[3] : 0;
+	$book = $this->book_model->get_by_id(array( 'id' => $book_id ));
+	
+	// page
+	$page['book'] = $book;
+?>
+
 <?php $this->load->view( 'common/meta', array( 'title' => 'Trend Moment' ) ); ?>
 
 <body>
@@ -10,6 +18,9 @@
 	    <div class="page-head">
 			<h2 class="pull-left button-back">Trend Moment</h2>
 			<div class="clearfix"></div>
+		</div>
+		<div class="hide">
+			<div class="cnt-page"><?php echo json_encode($page); ?></div>
 		</div>
 		
 	    <div class="matter"><div class="container">
@@ -30,7 +41,11 @@
 							<table id="datatable" class="table table-striped table-bordered table-hover">
 								<thead>
 									<tr>
-										<th>Name</th>
+										<th>Tanggal</th>
+										<th>Penjualan (x)</th>
+										<th>Waktu (y)</th>
+										<th>x . y</th>
+										<th>x<sup>2</sup></th>
 										<th class="center">Control</th></tr>
 								</thead>
 								<tbody></tbody>
@@ -43,66 +58,12 @@
 					</div>
 					
 					<div class="center">
-						<button class="btn btn-success">Button</button>
+						<button class="btn btn-success btn-generate">Generate</button>
 					</div>
 					
-					<div class="widget">
-						<div class="widget-head">
-							<div class="pull-left">Tables</div>
-							<div class="clearfix"></div>
-						</div>
-						<div class="widget-content">
-						
-
-                    <table class="table table-striped table-bordered table-hover">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Name</th>
-                          <th>Location</th>
-                          <th>Age</th>
-                          <th>Education</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>1</td>
-                          <td>Ashok</td>
-                          <td>Norway</td>
-                          <td>23</td>
-                          <td>B.Tech</td>
-                        </tr>
-                        <tr>
-                          <td>2</td>
-                          <td>Kumarasamy</td>
-                          <td>USA</td>
-                          <td>22</td>
-                          <td>BE</td>
-                        </tr>
-                        <tr>
-                          <td>3</td>
-                          <td>Babura</td>
-                          <td>UK</td>
-                          <td>43</td>
-                          <td>PhD</td>
-                        </tr>
-                        <tr>
-                          <td>4</td>
-                          <td>John Doe</td>
-                          <td>China</td>
-                          <td>73</td>
-                          <td>PUC</td>
-                        </tr>
-                        <tr>
-                          <td>5</td>
-                          <td>Santhosh</td>
-                          <td>Japan</td>
-                          <td>43</td>
-                          <td>M.Tech</td>
-                        </tr>                                                                        
-                      </tbody>
-                    </table>
-						</div>
+					<div class="cnt-result">
+						<div class="widget cnt-variable hide" style="padding: 15px;">&nbsp;</div>
+						<div class="widget cnt-table hide"></div>
 					</div>
 				</div>
 				
@@ -120,11 +81,29 @@
 						<div class="padd"><form class="form-horizontal">
 							<input type="hidden" name="action" value="update" />
 							<input type="hidden" name="id" value="0" />
+							<input type="hidden" name="book_id" value="0" />
 							
 							<div class="form-group">
-								<label class="col-lg-2 control-label">Name</label>
+								<label class="col-lg-2 control-label">Tanggal</label>
 								<div class="col-lg-10">
-									<input type="text" name="title" class="form-control" placeholder="Name" />
+									<div id="datetimepicker1" class="input-append datepicker">
+										<input name="tanggal" data-format="dd-MM-yyyy" type="text" class="form-control dtpicker" placeholder="Tanggal">
+										<span class="add-on">
+											<i data-time-icon="fa fa-time" data-date-icon="fa fa-calendar" class="btn btn-info"></i>
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-lg-2 control-label">Penjualan</label>
+								<div class="col-lg-10">
+									<input type="text" name="penjualan" class="form-control" placeholder="Penjualan" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-lg-2 control-label">Waktu</label>
+								<div class="col-lg-10">
+									<input type="text" name="waktu" class="form-control" placeholder="Waktu" />
 								</div>
 							</div>
 							
@@ -152,6 +131,11 @@
 $(document).ready(function() {
 	var dt = null;
 	var page = {
+		init: function() {
+			var raw_data = $('.cnt-page').html();
+			eval('var data = ' + raw_data);
+			page.data = data;
+		},
 		show_grid: function() {
 			$('.grid-main').show();
 			$('#form-trend').hide();
@@ -161,6 +145,7 @@ $(document).ready(function() {
 			$('#form-trend').show();
 		}
 	}
+	page.init();
 	
 	// global
 	$('.btn-show-grid').click(function() {
@@ -170,14 +155,17 @@ $(document).ready(function() {
 	// grid
 	var param = {
 		id: 'datatable',
-		source: web.host + 'trend/grid',
-		column: [ { }, { bSortable: false, sClass: "center" } ],
+		source: web.host + 'trend_moment/grid', iDisplayLength: 50,
+		column: [ { sClass: "center" }, { sClass: "center" }, { sClass: "center" }, { bSortable: false, sClass: "center" }, { bSortable: false, sClass: "center" }, { bSortable: false, sClass: "center" } ],
+		fnServerParams: function(aoData) {
+			aoData.push( { name: 'book_id', value: page.data.book.id } );
+		},
 		callback: function() {
 			$('#datatable .btn-edit').click(function() {
 				var raw_record = $(this).siblings('.hide').text();
 				eval('var record = ' + raw_record);
 				
-				Func.ajax({ url: web.host + 'trend/action', param: { action: 'get_by_id', id: record.id }, callback: function(result) {
+				Func.ajax({ url: web.host + 'trend_moment/action', param: { action: 'get_by_id', id: record.id }, callback: function(result) {
 					Func.populate({ cnt: '#form-trend', record: result });
 					page.show_form();
 				} });
@@ -189,7 +177,7 @@ $(document).ready(function() {
 				
 				Func.form.del({
 					data: { action: 'delete', id: record.id },
-					url: web.host + 'trend/action', callback: function() { dt.reload(); }
+					url: web.host + 'trend_moment/action', callback: function() { dt.reload(); }
 				});
 			});
 		}
@@ -201,10 +189,13 @@ $(document).ready(function() {
 		page.show_form();
 		$('#form-trend form')[0].reset();
 		$('#form-trend [name="id"]').val(0);
+		$('#form-trend [name="book_id"]').val(page.data.book.id);
 	});
 	$('#form-trend form').validate({
 		rules: {
-			title: { required: true, minlength: 2 }
+			tanggal: { required: true, minlength: 2 },
+			penjualan: { required: true },
+			waktu: { required: true }
 		}
 	});
 	$('#form-trend form').submit(function(e) {
@@ -214,7 +205,7 @@ $(document).ready(function() {
 		}
 		
 		Func.form.submit({
-			url: web.host + 'trend/action',
+			url: web.host + 'trend_moment/action',
 			param: Func.form.get_value('form-trend'),
 			callback: function(result) {
 				dt.reload();
@@ -222,6 +213,25 @@ $(document).ready(function() {
 				$('#form-trend form')[0].reset();
 			}
 		});
+	});
+	
+	$('.btn-generate').click(function() {
+		Func.ajax({ url: web.host + 'trend_moment/action', param: { action: 'generate', book_id: page.data.book.id }, callback: function(result) {
+			if (result.status == 1) {
+				
+				// get variable
+				Func.ajax({ url: web.host + 'trend_moment/get_view', param: { action: 'variable', book_id: page.data.book.id }, is_json: 0, callback: function(result) {
+					$('.cnt-variable').html(result).show();
+				} });
+				
+				// get table
+				Func.ajax({ url: web.host + 'trend_moment/get_view', param: { action: 'table', book_id: page.data.book.id }, is_json: 0, callback: function(result) {
+					$('.cnt-table').html(result).show();
+				} });
+			} else {
+				noty({ text: result.message, layout: 'topRight', type: 'error', timeout: 1500 });
+			}
+		} });
 	});
 });
 </script>

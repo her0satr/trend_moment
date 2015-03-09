@@ -5,9 +5,9 @@ $active_record = TRUE;
 
 if ($_SERVER['SERVER_NAME'] == 'localhost') {
 	$db['default']['hostname'] = 'localhost';
-	$db['default']['username'] = 'user_sygaas';
-	$db['default']['password'] = 'user_password';
-	$db['default']['database'] = 'raport_smp';
+	$db['default']['username'] = 'root';
+	$db['default']['password'] = '';
+	$db['default']['database'] = 'trend_moment_db';
 }
 
 $db['default']['dbdriver'] = 'mysql';
